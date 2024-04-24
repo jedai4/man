@@ -1,0 +1,40 @@
+### Сетритификаты .PS
+____________________________________
+# Удаление просроченых сертификатов
+____________________________________
+# Get Certificate list and assign to a variable
+$Certs = Get-ChildItem "Cert:\LocalMachine\TrustedPeople\" -Recurse
+
+# Loop through each object in $Certs
+Foreach($Cert in $Certs) {
+# If The objects property "NotAfter" is older than the current time, delete
+	If($Cert.NotAfter -lt (Get-Date)) {
+   		$Cert | Remove-Item
+   }
+}
+
+____________________________________
+# Экспорт сетритиката с машины
+____________________________________
+Get-ChildItem -Path Cert:\CurrentUser\My\ | Export-Certificate -FilePath C:\Certs\$env:computername.sst -Type SST
+
+____________________________________
+# Импорт сертификата на машину.
+____________________________________
+$sstStore = ( Get-ChildItem -Path C:\Certs\allcerts.sst )
+$sstStore | Import-Certificate -CertStoreLocation Cert:\LocalMachine\TrustedPeople\
+
+
+____________________________________
+# Уведомление на почту о сертификатах которые просрочатся через 35 дней
+____________________________________
+# Get Certificate list and assign to a variable
+$Certs = Get-ChildItem "Cert:\LocalMachine\TrustedPeople\" -Recurse
+
+# Loop through each object in $Certs
+Foreach($Cert in $Certs) {
+# If The objects property "NotAfter" is older than the current time, notificate
+	If($Cert.NotAfter -lt (Get-Date).AddDays(35)) {
+   		Send-MailMessage -To "i.seleznev@inlinegroup.ru" -From "CERT@inlinegroup.ru"  -Subject "Сертификат просрочен " -Body $Cert  -SmtpServer "owa.inlinegroup.ru" -Port 587 -Encoding UTF8
+   }
+}
