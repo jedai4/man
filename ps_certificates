@@ -35,6 +35,6 @@ $Certs = Get-ChildItem "Cert:\LocalMachine\TrustedPeople\" -Recurse
 Foreach($Cert in $Certs) {
 # If The objects property "NotAfter" is older than the current time, notificate
 	If($Cert.NotAfter -lt (Get-Date).AddDays(35)) {
-   		Send-MailMessage -To "i.seleznev@inlinegroup.ru" -From "CERT@inlinegroup.ru"  -Subject "Сертификат просрочен " -Body $Cert  -SmtpServer "owa.inlinegroup.ru" -Port 587 -Encoding UTF8
+   		Send-MailMessage -To "EMAIL" -From "EMAIL"  -Subject "Сертификат просрочен " -Body $Cert  -SmtpServer "email server" -Port 587 -Encoding UTF8
    }
 }
